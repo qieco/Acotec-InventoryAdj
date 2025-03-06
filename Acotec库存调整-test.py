@@ -54,13 +54,13 @@ def rc_todata(data):
     #return data
 try:
     if not isPROD:
-        rc_data = [{"data":[{"inventoryadjustment":{"customform":117,"subsidiary":10,"account":"2615","memo":"111","department":"537","class":"783","inventory":[{"item":"148307","location":"10","adjustqtyby": "-1","inventorydetail":{"inventoryassignment":[{"receiptinventorynumber":"A241104142","binnumber":"6947", "quantity":"-1"}]}}]}}],"appkey":"670e16477c064f6e3c297049","P_ENDFLAG":"1"}]
-
+        rc_data = [{"data":[{"inventoryadjustment":{"requestid":497836,"custbody5":"OO-000009","customform":117,"subsidiary":10,"account":"2615","memo":"13:55","department":"537","calss":"783","inventory":[{"item":"104969","location":"8","adjustqtyby":"-1.00","inventorydetail":{"inventoryassignment":[{"receiptinventorynumber":"A240401201","binnumber":"10713","quantity":"-1.00"}]}}]}}],"appkey":"670e16477c064f6e3c297049","P_ENDFLAG":"1"}]
     input_data = json.dumps(rc_data, indent=4)
     input_data = json.loads(input_data)
 
     entry = input_data[0]['data'][0]
-    print(type(entry))
+    request_id = entry['inventoryadjustment'].get('requestid', None)
+    #print(type(entry))
     processor = DataProcessor(entry)
     entry = processor.to_json()
     url = "https://7557353-sb1.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=1171&deploy=1"
@@ -78,24 +78,30 @@ try:
         is_create_success = response_data['success']
 
         if is_create_success:
-            po_number = response_data['DocumentNumber']
+            ir_number = response_data['DocumentNumber']
                 # 创建字典结构
             data_dict = {
                 "success": True,
-                "创建了采购订单": po_number,
+                "创建了采购订单": ir_number,
+                "requesitId": request_id,
+                "nskcdzdh": ir_number
             }
             data_list = [data_dict]
 
             # 将字典转换为 JSON 字符串
             data_json = json.dumps(data_dict, ensure_ascii=False)
             rc_todata(data_list)
-            print(json.dumps({"success": "true"}))
+            print(json.dumps({"success": "true", "requesitId": f"'{request_id}'", "nskcdzdh": f"'{ir_number}'"}))
         else:
             error_message = response_data['error']
             data_dict = {
                 "success": False,
                 "创建了采购订单": f'NS返回错误:{error_message}',
+                "requesitId": request_id,
+                "nskcdzdh": error_message
             }
+            data_list = [data_dict]
+            rc_todata(data_list)
 
     except Exception as e:
         error_message = str(e)
