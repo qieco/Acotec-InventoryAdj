@@ -60,6 +60,7 @@ try:
 
     entry = input_data[0]['data'][0]
     request_id = entry['inventoryadjustment'].get('requestid', None)
+    oa_number = entry['inventoryadjustment'].get('custbody5', None)
     #print(type(entry))
     processor = DataProcessor(entry)
     entry = processor.to_json()
@@ -83,26 +84,30 @@ try:
             data_dict = {
                 "success": True,
                 "创建了采购订单": ir_number,
-                "requesitId": request_id,
-                "nskcdzdh": ir_number
+                "requestId": request_id,
+                "nskcdzdh": ir_number,
+                "request_id" : request_id,
+                "oa_number": oa_number
             }
             data_list = [data_dict]
 
             # 将字典转换为 JSON 字符串
             data_json = json.dumps(data_dict, ensure_ascii=False)
             rc_todata(data_list)
-            print(json.dumps({"success": "true", "requesitId": f"'{request_id}'", "nskcdzdh": f"'{ir_number}'"}))
+            print({"success": "true", "requestId": f"{request_id}", "nskcdzdh": f"{ir_number}"})
         else:
             error_message = response_data['error']
             data_dict = {
                 "success": False,
                 "创建了采购订单": f'NS返回错误:{error_message}',
-                "requesitId": request_id,
-                "nskcdzdh": error_message
+                "requestId": request_id,
+                "nskcdzdh": error_message,
+                "requesit_id" : request_id,
+                "oa_number": oa_number
             }
             data_list = [data_dict]
             rc_todata(data_list)
-
+            print({"success": "false", "requestId": f"{request_id}", "nskcdzdh": f"{error_message}"})
     except Exception as e:
         error_message = str(e)
         print(e)
