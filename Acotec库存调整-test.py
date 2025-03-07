@@ -19,7 +19,7 @@ class DataProcessor:
         Adjust the types of the fields in the data structure.
         """
         # Ensure the main keys are integers where applicable
-        for key in ['customform', 'subsidiary', 'account', 'department', 'calss']:
+        for key in ['customform', 'subsidiary', 'account', 'department', 'class']:
             if key in self.data['inventoryadjustment']:
                 self.data['inventoryadjustment'][key] = int(self.data['inventoryadjustment'][key])
 
